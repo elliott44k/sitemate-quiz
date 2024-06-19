@@ -1,11 +1,47 @@
-import { Image, StyleSheet, Platform } from 'react-native';
+import { Image, StyleSheet, Platform, TextInput, View, Button } from 'react-native';
 
 import { HelloWave } from '@/components/HelloWave';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import { useState } from 'react';
 
 export default function HomeScreen() {
+
+  const API_KEY = '183daca270264bad86fc5b72972fb82a';
+
+  const [searchValue, setSearchValue] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [loadingSearch, setLoadingSearch] = useState(false)
+  const [error, setError] = useState(false);
+  const [errorText, setErrorText] = useState('');
+  const newsSearchSubmit = () => {
+    setError(false);
+    if (searchValue.length === 0) {
+      setError(true);
+      setErrorText('Please input a search term')
+    } else {
+      setLoadingSearch(true);
+      console.log(searchValue);
+      return fetch('https://newsapi.org/v2/top-headlines?' + new URLSearchParams({
+        apiKey: API_KEY,
+        q: searchValue,
+      }), {
+        method: "GET",
+      })
+          .then(response => response.json())
+          .then(json => {
+            console.log(json);
+            setSearchResults(json.articles);
+            setLoadingSearch(false);
+          })
+          .catch(error => {
+            console.error(error);
+            setLoadingSearch(false);
+          });
+    }
+  }
+
   return (
     <ParallaxScrollView
       headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
@@ -20,6 +56,37 @@ export default function HomeScreen() {
         <HelloWave />
       </ThemedView>
       <ThemedView style={styles.stepContainer}>
+        <TextInput
+            style={styles.input}
+            onChangeText={setSearchValue}
+            value={searchValue}
+            placeholder={'Find the news you seek'}
+            onSubmitEditing={newsSearchSubmit}
+        />
+        {error && (
+            <ThemedText>
+              {errorText}
+            </ThemedText>
+        )}
+        <View>
+          <Button
+              title="Search"
+              onPress={() => newsSearchSubmit()}
+          />
+        </View>
+        {!loadingSearch && searchResults && searchResults.length > 0 && (
+            <View>
+              <ThemedText type="title">fffff!</ThemedText>
+              {searchResults.length}
+            </View>
+        )}
+
+        {!loadingSearch && searchResults && searchResults.length === 0 && (
+            <View>
+              <ThemedText type="title">No results found</ThemedText>
+            </View>
+        )}
+
         <ThemedText type="subtitle">Step 1: Try it</ThemedText>
         <ThemedText>
           Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
@@ -66,5 +133,11 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     position: 'absolute',
+  },
+  input: {
+    height: 40,
+    margin: 12,
+    borderWidth: 1,
+    padding: 10,
   },
 });
