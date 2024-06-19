@@ -6,14 +6,12 @@ import {
   StatusBar,
   ScrollView,
   SafeAreaView,
-  FlatList, Text, Linking, Platform
+  Text, Linking, Platform
 } from 'react-native';
 
-import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { useState } from 'react';
-import { white } from 'colorette';
 
 export default function HomeScreen() {
   const API_KEY = '183daca270264bad86fc5b72972fb82a';
