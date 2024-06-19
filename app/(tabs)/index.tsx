@@ -6,7 +6,7 @@ import {
   StatusBar,
   ScrollView,
   SafeAreaView,
-  FlatList, Text, Linking
+  FlatList, Text, Linking, Platform
 } from 'react-native';
 
 import ParallaxScrollView from '@/components/ParallaxScrollView';
@@ -79,7 +79,23 @@ export default function HomeScreen() {
               onPress={() => newsSearchSubmit()}
           />
         </View>
-        {!loadingSearch && searchResults && searchResults.length > 0 && (
+        {!loadingSearch && searchResults && searchResults.length > 0 && Platform.OS === 'web' &&(
+            <View>
+              <ol style={{paddingLeft:'30px'}}>
+                {searchResults.map(article =>
+                  <li style={{marginBottom: '20px'}} key={article.title}>
+                    <Text>{article.title}</Text>
+                    <Text style={{color: 'blue'}}
+                        onPress={() => Linking.openURL(article.url)}>
+                      {article.url}
+                    </Text>
+                  </li>
+                )}
+              </ol>
+            </View>
+        )}
+
+        {!loadingSearch && searchResults && searchResults.length > 0 && Platform.OS === 'ios' &&(
             <View>
               <ThemedText type="title">Results:</ThemedText>
                 {searchResults.map(article =>
